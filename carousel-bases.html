@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>carousel bases</title>
+  <style>
+    .container{
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+      border-radius: 4px;
+      box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.4);
+    }
+    .carousel{
+      position: relative;
+      height: 200px;
+    }
+
+    .carousel .panel > a {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      font-size: 20px;
+      opacity: 0;
+      transition: all .3s;
+    }
+    .carousel .panel > a.active {
+      opacity: 1;
+      z-index: 3;
+    }
+    .carousel .panel > a:nth-child(1){
+      background: url(https://i.loli.net/2020/04/01/SJqi7Wvc6yGCLDA.jpg) center no-repeat;
+      background-size: cover;
+    }
+    .carousel .panel > a:nth-child(2){
+      background: url(https://i.loli.net/2020/04/01/idl7woC6VpQYr8P.jpg) center no-repeat;
+      background-size: cover;
+    }
+    .carousel .panel > a:nth-child(3){
+      background: url(https://i.loli.net/2020/04/01/DjtTgHJOkxwp8Iu.jpg) center no-repeat;
+      background-size: cover;
+    }
+    .carousel .panel > a:nth-child(4){
+      background: url(https://i.loli.net/2020/04/01/dvY7wutQfOikKoN.jpg) center no-repeat;
+      background-size: cover;
+    }
+
+    .carousel .btn{
+      position: absolute;
+      top: 50%;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 36px;
+      height: 36px;
+      border: none;
+      outline: none;
+      border-radius: 50%;
+      background-color: rgba(31,45,61,.11);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .carousel .btn-pre{
+      left: 10px;
+      transform: translateY(-50%) translateX(-100%);
+    }
+    .carousel:hover .btn-pre{
+      opacity: 1;
+      transform: translateY(-50%) translateX(0%);
+    }
+    .carousel .btn-next{
+      right: 10px;
+      transform: translateY(-50%) translateX(100%);
+    }
+    .carousel:hover .btn-next{
+      opacity: 1;
+      transform: translateY(-50%) translateX(0%);
+    }
+    .carousel .btn::after{
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      border-top: 3px solid #fff;
+      border-right: 3px solid #fff;
+    }
+    .carousel .btn-pre::after{
+      transform: rotate(-135deg);
+    }
+    .carousel .btn-next::after{
+      transform: rotate(45deg);
+    }
+
+    .carousel .indicators{
+      position: absolute;
+      bottom: 20px;
+      right: 50%;
+      z-index: 20;
+      transform: translateX(50%);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .carousel .indicators > li {
+      display: inline-block;
+      padding: 12 2px;
+      cursor: pointer;
+    }
+
+    .carousel .indicators > li::after{
+      content: '';
+      display: block;
+      width: 25px;
+      height: 2px;
+      border-radius: 2px;
+      background:rgba(0, 0, 0, 0.4);
+    }
+    .carousel .indicators > li.active::after{
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>carousel</h1>
+    <div class="carousel">
+      <div class="btn-group">
+        <button class="btn btn-pre"></button>
+        <button class="btn btn-next"></button>
+      </div>
+      <div class="panel">
+        <a href="#" class='active'>1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">4</a>
+      </div>
+        <ul class="indicators">
+          <li class="active"></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+    </div>
+  </div>
+
+  <script>
+    class Carousel {
+      constructor($root) {
+        this.$root = $root
+        this.$pre = $root.querySelector('.carousel .btn-pre')
+        this.$next = $root.querySelector('.carousel .btn-next')
+        this.$$indicators = $root.querySelectorAll('.carousel .indicators > li' )
+        this.$$panels = $root.querySelectorAll('.carousel .panel > a')
+
+        this.bind()
+      }
+
+      bind() {
+        this.$pre.onclick = () => {
+          let index = this.getPreIndex()
+          this.setIndicator(index)
+          this.setPage(index)
+        }
+
+        this.$next.onclick = () => {
+          let index = this.getNextIndex()
+          this.setIndicator(index)
+          this.setPage(index)
+        }
+
+        this.$$indicators.forEach($indicator => $indicator.onclick = (e) =>{
+          let index = Array.from(this.$$indicators).indexOf(e.target)
+          this.setPage(index)
+          this.setIndicator(index)
+        })
+      }
+      getIndex() {
+        return Array.from(this.$$panels).indexOf(this.$root.querySelector('.carousel .panel .active'))
+      }
+      
+      getPreIndex() {
+        return (this.getIndex() - 1 + this.$$panels.length) % this.$$panels.length
+      }
+
+      getNextIndex() {
+        return (this.getIndex() + 1) % this.$$panels.length
+      }
+
+      setPage(index) {
+        this.$$panels.forEach($panel => $panel.classList.remove('active'))
+        this.$$panels[index].classList.add('active')
+      }
+      setIndicator(index) {
+        this.$$indicators.forEach($indicator => $indicator.classList.remove('active'))
+        this.$$indicators[index].classList.add('active')
+      }
+    }
+
+    new Carousel(document.querySelector('.container'))
+
+
+  </script>
+
+
+</body>
+</html>
